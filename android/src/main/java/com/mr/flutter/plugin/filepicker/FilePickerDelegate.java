@@ -134,7 +134,11 @@ public class FilePickerDelegate implements PluginRegistry.ActivityResultListener
                                  Uri currentUri = data.getClipData().getItemAt(currentItem).getUri();
 
                                 if (Objects.equals(type, "image/*") && compressionQuality > 0) {
-                                    currentUri = FileUtils.compressImage(currentUri, compressionQuality, activity.getApplicationContext());
+                                    try {
+                                        currentUri = FileUtils.compressImage(currentUri, compressionQuality, activity.getApplicationContext());
+                                    } catch (RuntimeException e) {
+                                        finishWithError("compress_image", "Failed " + e);
+                                    }
                                 }
                                 final FileInfo file = FileUtils.openFileStream(FilePickerDelegate.this.activity, currentUri, loadDataToMemory);
                                 if(file != null) {
@@ -148,8 +152,10 @@ public class FilePickerDelegate implements PluginRegistry.ActivityResultListener
                         } else if (data.getData() != null) {
                             Uri uri = data.getData();
 
-                            if (Objects.equals(type, "image/*") && compressionQuality > 0) {
+                            try {
                                 uri = FileUtils.compressImage(uri, compressionQuality, activity.getApplicationContext());
+                            } catch (RuntimeException e) {
+                                finishWithError("compress_image", "Failed" + e);
                             }
 
                             if (type.equals("dir") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
