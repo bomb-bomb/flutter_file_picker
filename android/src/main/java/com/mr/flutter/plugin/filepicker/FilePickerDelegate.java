@@ -152,10 +152,12 @@ public class FilePickerDelegate implements PluginRegistry.ActivityResultListener
                         } else if (data.getData() != null) {
                             Uri uri = data.getData();
 
-                            try {
-                                uri = FileUtils.compressImage(uri, compressionQuality, activity.getApplicationContext());
-                            } catch (RuntimeException e) {
-                                finishWithError("compress_image", "Failed" + e);
+                            if (Objects.equals(type, "image/*") && compressionQuality > 0) {
+                                try {
+                                    uri = FileUtils.compressImage(uri, compressionQuality, activity.getApplicationContext());
+                                } catch (RuntimeException e) {
+                                    finishWithError("compress_image", "Failed" + e);
+                                }
                             }
 
                             if (type.equals("dir") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
